@@ -49,6 +49,8 @@ public class Product {
 
     @ManyToOne (cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", nullable = false)
-    private ProductCategory categoryId;
+    /* It's important to name this variable properly(not categoryId), because then we will reference to it when Spring
+    will create findByCategoryId method, otherwise we will get an error*/
+    private ProductCategory category;
 
 }
