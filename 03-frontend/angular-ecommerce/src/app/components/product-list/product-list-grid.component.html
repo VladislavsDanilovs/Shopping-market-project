@@ -14,6 +14,12 @@
                     </div>
                 </div>
 
+                    <!-- if products empty then display a message -->
+                    <!-- ? after products is safe navigation operrator, that guards against null and undefined values in propert paths -->
+                    <div *ngIf="products?.length == 0" class = "alert alert-warning col-md-12" role="alert">
+                        No products found.
+                    </div>
+
             </div>
         </div>
     </div>
