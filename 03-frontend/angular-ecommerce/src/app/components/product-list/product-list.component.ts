@@ -11,9 +11,15 @@ import { ActivatedRoute } from '@angular/router';
 export class ProductListComponent implements OnInit {
 
   products: Product[] = [];
-  currentCategoryId: number | undefined;
+  currentCategoryId: number = 1;
+  previousCategoryId: number = 1;
   currentCategoryName: string | undefined;
-  searchMode: boolean | undefined;
+  searchMode: boolean  = false;
+
+  // properties for pagination
+  thePageNumber: number = 1;
+  thePageSize: number = 10;
+  theTotalElements: number = 0;
 
   /* Injecting our ProductService*/
   constructor(private productService: ProductService,
@@ -67,14 +73,40 @@ export class ProductListComponent implements OnInit {
       //not category id available ... default to category id 1
       this.currentCategoryId = 1;
       this.currentCategoryName = 'Books';
-
     }
-    //get the products for the given category id
-    this.productService.getProductList(this.currentCategoryId).subscribe(
-      //assigning result to the Product array
-      data => {
-        this.products = data;
-      }
-    )
+
+      /* Check if we have a different category than previous
+      Angular will reuse a component if it is currently being viewed */
+
+    // if we have a different category id than previous, then set thePageNumber back to 1
+    if (this.previousCategoryId != this.currentCategoryId) {
+      this.thePageNumber = 1;
+    }
+
+    this.previousCategoryId = this.currentCategoryId;
+      
+    console.log(`currentCategoryId=${this.currentCategoryId}, thePageNumber=${this.thePageNumber}`);
+
+ // now get the products for the given category id
+ this.productService.getProductListPaginate(this.thePageNumber - 1,
+  this.thePageSize,
+  this.currentCategoryId)
+  .subscribe(this.processResult());
+
   }
+
+  /* When data arrives from product service then set properties based on the data.
+  Everything on right-hand side of assignment is data from Spring Data REST JSON
+  Pagination component: pages are 1 bases, but in Spring Data REST: pages are 0 based, so data.page.number +1.
+  */
+
+  processResult() {
+    return (data: any) => {
+      this.products = data._embedded.products;
+      this.thePageNumber = data.page.number + 1;
+      this.thePageSize = data.page.size;
+      this.theTotalElements = data.page.totalElements;
+    };
+  }
+ 
 }
