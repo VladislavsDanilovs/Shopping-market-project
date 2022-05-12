@@ -15,6 +15,7 @@ export class CartService {
 
   totalPrice: Subject<number> = new Subject<number>();
   totalQuantity: Subject<number> = new Subject<number>();
+  totalShippingPrice: Subject<number> = new Subject<number>();
 
   constructor() { }
 
@@ -25,9 +26,9 @@ export class CartService {
     let existingCartItem: CartItem | undefined;
 
 
-    if(this.cartItems.length > 0){
+    if (this.cartItems.length > 0) {
 
-    //  find the item in the cart based on item id
+      //  find the item in the cart based on item id
 
       // for(let tempCartItem of this.cartItems){
       //   if(tempCartItem.id === theCartItem.id){
@@ -39,11 +40,11 @@ export class CartService {
       // refactored code. Returns first element that passes, else returns undefined.
       existingCartItem = this.cartItems.find(tempCartItem => (tempCartItem.id === theCartItem.id));
 
-    // check if we found it
-    alreadyExistsInCart = (existingCartItem != undefined);
+      // check if we found it
+      alreadyExistsInCart = (existingCartItem != undefined);
     }
 
-    if(alreadyExistsInCart){
+    if (alreadyExistsInCart) {
       //increment the quantity
       existingCartItem!.quantity++;
     }
@@ -60,23 +61,27 @@ export class CartService {
   computeCartTotals() {
     let totalPriceValue: number = 0;
     let totalQuantityValue: number = 0;
+    let totalShippingPrice: number = 0;
 
-    for(let currentCartItem of this.cartItems){
+    for (let currentCartItem of this.cartItems) {
       totalPriceValue += currentCartItem.quantity * currentCartItem.unitPrice;
       totalQuantityValue += currentCartItem.quantity;
     }
 
+    totalShippingPrice = 0.05 * totalPriceValue;
+
     // publish the new values ... all subscribers will receive the new data
     this.totalPrice.next(totalPriceValue);
     this.totalQuantity.next(totalQuantityValue);
+    this.totalShippingPrice.next(totalShippingPrice);
 
     //log cart data for debugging purposes
-    this.logCartData(totalPriceValue, totalQuantityValue);
+    this.logCartData(totalPriceValue, totalQuantityValue, totalShippingPrice);
   }
 
-  logCartData(totalPriceValue: number, totalQuantityValue: number) {
+  logCartData(totalPriceValue: number, totalQuantityValue: number, totalShippingPrice: number) {
     console.log('Contents of the cart');
-    for(let tempCartItem of this.cartItems) {
+    for (let tempCartItem of this.cartItems) {
 
       const subTotalPrice = tempCartItem.quantity * tempCartItem.unitPrice;
 
@@ -84,7 +89,36 @@ export class CartService {
       unitPrice=${tempCartItem.unitPrice}, subTotalPrice=${subTotalPrice}`);
     }
     //toFixed(2) means two digits after decimal (124.98)
-    console.log(`totalPrice: ${totalPriceValue.toFixed(2)}, totalQuantity: ${totalQuantityValue}`);
+    console.log(`totalPrice: ${totalPriceValue.toFixed(2)}, totalQuantity: ${totalQuantityValue}, totalShippingPrice: ${totalShippingPrice.toFixed(2)}`);
     console.log('-----');
+  }
+
+  decrementQuantity(cartItem: CartItem) {
+    cartItem.quantity--;
+
+    if (cartItem.quantity === 0) {
+      this.removeItemsFromCart(cartItem);
+    }
+    else {
+      this.computeCartTotals();
+    }
+
+  }
+
+  removeItemsFromCart(cartItem: CartItem) {
+
+    // get the index of item in the array
+    const itemIndex = this.cartItems.findIndex(
+    tempCartItem => tempCartItem.id === cartItem.id);
+
+    // if found, remove the item from the array at the given index. If it would not find it then index will be -1.
+    if (itemIndex > -1) {
+      this.cartItems.splice(itemIndex, 1);
+
+      this.computeCartTotals();
+    }
+
+
+
   }
 }
