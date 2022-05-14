@@ -7,7 +7,7 @@ import { CartItem } from '../common/cart-item';
 })
 export class CartService {
 
-  cartItems: CartItem[] = [];
+  cartItems: CartItem[];
 
   /* Subject is a sublacc of Observable.
   We can use Subject to publish event in our code.
@@ -17,7 +17,18 @@ export class CartService {
   totalQuantity: Subject<number> = new Subject<number>();
   totalShippingPrice: Subject<number> = new Subject<number>();
 
-  constructor() { }
+  /*
+
+  cartItems uses the constructor to initialises the cartItems variable.
+
+  If there is a value in the sessionStorage cartItems value we initialise with that value, otherwise we initialise to an empty array.
+
+  The reason for JSON.parse is sessionStorage and localStorage store strings. So we need to convert the string back into a javascript object equivalent (json).
+
+  */
+  constructor() {
+    this.cartItems = JSON.parse(sessionStorage.getItem('cartItems')!) ? JSON.parse(sessionStorage.getItem('cartItems')!) : [];
+  }
 
   addToCart(theCartItem: CartItem) {
 
@@ -77,6 +88,7 @@ export class CartService {
 
     //log cart data for debugging purposes
     this.logCartData(totalPriceValue, totalQuantityValue, totalShippingPrice);
+    this.cartItemsInSessionStorage();
   }
 
   logCartData(totalPriceValue: number, totalQuantityValue: number, totalShippingPrice: number) {
@@ -117,8 +129,13 @@ export class CartService {
 
       this.computeCartTotals();
     }
-
-
-
+  }
+  
+/*
+Sets the sessionStorage cartItems value with the currentItems variable value.
+The reason for JSON.stringify is sessionStorage and localStorage store strings. So this allows us to convert our array into a string equivalent.
+*/
+  cartItemsInSessionStorage() {
+    sessionStorage.setItem('cartItems', JSON.stringify(this.cartItems));
   }
 }
