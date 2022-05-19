@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CartItem } from 'src/app/common/cart-item';
 import { Country } from 'src/app/common/country';
 import { State } from 'src/app/common/state';
@@ -37,9 +37,17 @@ export class CheckoutComponent implements OnInit {
 
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
-        firstName: [''],
-        lastName: [''],
-        email: ['']
+        firstName: new FormControl('', [Validators.required, Validators.minLength(2)]),
+        lastName:  new FormControl('', [Validators.required, Validators.minLength(2)]),
+        email: new FormControl('', [Validators.required, 
+        Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')])
+        /*
+        ^[a-z0-9._%+-] - match any combination of letters and digits, optional period
+        [a-z0-9.-]+\\ - match any combination of letters and digits, with period
+        [a-z]{2,4}$ - domain extension 2-4 letters
+
+        more info - http://regextutorials.com/
+        */
       }),
       shippingAddress: this.formBuilder.group({
         country: [''],
@@ -94,16 +102,12 @@ export class CheckoutComponent implements OnInit {
       }
     )
 
-    // populate states
-    // this.shoppingMarketFormService.getStates(this.theCountryCode).subscribe(
-    //   data => {
-    //     console.log("Retrieved states: " + JSON.stringify(data));
-    //     this.states = data;
-    //   }
-    // )
-
     this.listCartDetails();
   }
+
+  get firstName() { return this.checkoutFormGroup.get('customer.firstName'); }
+  get lastName() { return this.checkoutFormGroup.get('customer.lastName'); }
+  get email() { return this.checkoutFormGroup.get('customer.email'); }
 
   copyShippingAddressToBillingAddress(event: any) {
     if (event.target.checked) {
@@ -141,6 +145,12 @@ export class CheckoutComponent implements OnInit {
 
   onSubmit() {
     console.log("Handling the submit button");
+
+    if (this.checkoutFormGroup.invalid) {
+      this.checkoutFormGroup.markAllAsTouched();
+      // Touching all fields triggers the display of the error messages
+    }
+
     console.log(this.checkoutFormGroup.get('customer')!.value);
     console.log("The email address is" + this.checkoutFormGroup.get('customer')!.value.email);
     console.log("The shipping address country is" + this.checkoutFormGroup.get('shippingAddres')!.value.country.name);
