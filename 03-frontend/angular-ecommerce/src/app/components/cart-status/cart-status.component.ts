@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LocalStorage, LocalStorageService, SessionStorage, SessionStorageService } from 'ngx-webstorage';
 import { CartService } from 'src/app/services/cart.service';
 
 @Component({

@@ -177,8 +177,9 @@ export class CheckoutComponent implements OnInit {
     this.cartService.totalShippingPrice.subscribe(
       data => this.shippingPrice = data
     );
- 
-    this.cartService.computeCartTotals();
+    
+    // Since we are using behaviour subject we dont need compute method
+    // this.cartService.computeCartTotals();
   }
 
   onSubmit() {
