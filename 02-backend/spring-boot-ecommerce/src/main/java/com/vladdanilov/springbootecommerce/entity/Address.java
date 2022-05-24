@@ -22,11 +22,14 @@ public class Address {
     @Column(name="city")
     private String city;
 
+    @Column(name="state")
+    private String state;
+
     @Column(name="country")
     private String country;
 
     @Column(name="zip_code")
-    private int zipCode;
+    private String zipCode;
 
     @OneToOne
     @PrimaryKeyJoinColumn
