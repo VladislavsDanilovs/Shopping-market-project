@@ -9,7 +9,7 @@
     right:0;
     min-width:95px;
     color:#fff;
-    border:10px solid #0c3151;
+    border:1px solid #0c3151;
     -webkit-border-radius:3px;
     -moz-border-radius:3px;
     border-radius:43px;
@@ -36,7 +36,8 @@
     - remove 'solid', 'font-size', 'color'
 */
 
-.login-status-info {
+.login-status-user-info {
+    color: #fff;
     line-height:43px;
     border:1px;
     padding:0 17px;
