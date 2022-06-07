@@ -2,7 +2,10 @@ package com.vladdanilov.springbootecommerce.dao;
 
 import com.vladdanilov.springbootecommerce.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
+    // SELECT * FROM Customer c WHERE c.email = theEmail
+    // Method returns null if not found
+    Customer findByEmail(String theEmail);
 }
