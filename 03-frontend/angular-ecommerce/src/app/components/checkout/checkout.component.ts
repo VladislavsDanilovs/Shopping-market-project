@@ -35,6 +35,8 @@ export class CheckoutComponent implements OnInit {
   shippingAddressStates: State[] = [];
   billingAddressStates: State[] = [];
 
+  storage: Storage = sessionStorage;
+
   constructor(private formBuilder: FormBuilder,
               private cartService: CartService,
               private shoppingMarketFormService: ShoppingMarketFormService,
@@ -42,6 +44,10 @@ export class CheckoutComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit(): void {
+
+    // read the user's email address from browser storage
+    const theEmail = JSON.parse(this.storage.getItem('userEmail'));
+    console.log(theEmail);
 
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
@@ -55,7 +61,7 @@ export class CheckoutComponent implements OnInit {
             Validators.minLength(2), 
             ShoppingMarketValidators.notOnlyWhitespace]),
 
-        email: new FormControl('', [Validators.required, 
+        email: new FormControl(theEmail, [Validators.required, 
         Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')])
         /*
         ^[a-z0-9._%+-] - match any combination of letters and digits, optional period
@@ -277,6 +283,9 @@ export class CheckoutComponent implements OnInit {
 
     // reset the form
     this.checkoutFormGroup.reset();
+
+    // clear the cart contents from the localstorage
+    localStorage.clear();
 
     // navigate back to the products page
     this.router.navigateByUrl("/products");
