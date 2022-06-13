@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { Product } from '../common/product';
 import { ProductCategory } from '../common/product-category';
 
@@ -9,9 +10,9 @@ import { ProductCategory } from '../common/product-category';
 })
 export class ProductService {
 
-  private baseUrl = 'http://localhost:8080/api/products';
+  private baseUrl = environment.shoppingMarketApiUrl + '/products';
 
-  private categoryUrl = 'http://localhost:8080/api/product-category';
+  private categoryUrl = environment.shoppingMarketApiUrl + '/product-category';
 
   /* http://localhost:8080/api/products/search/findByNameContaining?name={{ search }} */
 
@@ -71,6 +72,8 @@ export class ProductService {
 
       const searchUrl = `${this.baseUrl}/search/findByCategoryId?id=${theCategoryId}`
       + `&page=${thePage}&size=${thePageSize}`;
+
+      console.log(`Getting products from - ${searchUrl}`);
 
       return this.httpClient.get<GetResponseProducts>(searchUrl);
   }
